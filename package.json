@@ -1,0 +1,45 @@
+{
+  "name": "sql-match",
+  "description": "Match a string using an SQL pattern.",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Steven Vachon <contact@svachon.com> (https://www.svachon.com/)",
+  "repository": "stevenvachon/sql-match",
+  "dependencies": {
+    "is-string": "^1.0.4"
+  },
+  "devDependencies": {
+    "babelify": "^8.0.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "benchmark": "^2.1.4",
+    "browserify": "^15.1.0",
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.0",
+    "gzip-size-cli": "^2.1.0",
+    "mocha": "^4.1.0",
+    "nightmare": "^2.10.0",
+    "nyc": "^11.4.1",
+    "uglify-js": "^3.3.5"
+  },
+  "engines": {
+    "node": ">= 6"
+  },
+  "scripts": {
+    "benchmark": "node benchmark.js",
+    "browserify": "browserify index.js --transform [ babelify --presets [ env ] ] --standalone isSQLMatch | uglifyjs --compress --mangle -o browser.js",
+    "ci": "npm test && nyc report --reporter=text-lcov | coveralls",
+    "posttest": " nyc report --reporter=html && npm run benchmark --silent && gzip-size browser.js",
+    "pretest": "npm run browserify --silent",
+    "test": "nyc --reporter=text-summary mocha test.js --check-leaks --bail"
+  },
+  "files": [
+    "browser.js",
+    "index.js"
+  ],
+  "keywords": [
+    "match",
+    "sql",
+    "wildcard"
+  ]
+}
