@@ -1,5 +1,5 @@
 "use strict";
-const isSQLMatch = require("./");
+const {isSQLMatch} = require("./");
 const {Suite} = require("benchmark");
 
 new Suite()

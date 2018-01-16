@@ -1,4 +1,4 @@
-# sql-match [![NPM Version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url]
+# sql-match [![NPM Version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependency Monitor][greenkeeper-image]][greenkeeper-url]
 
 > Match a string using an SQL pattern.
 
@@ -33,7 +33,7 @@ npm install sql-match
 `isSQLMatch(pattern, testString)`
 
 ```js
-const isSQLMatch = require('sql-match');
+const {isSQLMatch} = require('sql-match');
 
 isSQLMatch('string', 'string');  //-> true
 
@@ -44,6 +44,16 @@ isSQLMatch('str%', 'string');  //-> true
 isSQLMatch('_tring', 'string');  //-> true
 isSQLMatch('st__ng', 'string');  //-> true
 isSQLMatch('strin_', 'string');  //-> true
+```
+
+Optionally, you can create a reusable/cacheable regular expression to improve performance:
+```js
+const {sqlToRegex} = require('sql-match');
+
+const pattern = sqlToRegex('%ing');
+
+['string','stringing'].every(testString => pattern.test(testString));
+//-> true
 ```
 
 
@@ -91,3 +101,5 @@ SELECT '\string' LIKE '\\string';  --> true
 [travis-url]: https://travis-ci.org/stevenvachon/sql-match
 [coveralls-image]: https://img.shields.io/coveralls/stevenvachon/sql-match.svg
 [coveralls-url]: https://coveralls.io/github/stevenvachon/sql-match
+[greenkeeper-image]: https://badges.greenkeeper.io/stevenvachon/sql-match.svg
+[greenkeeper-url]: https://greenkeeper.io/
