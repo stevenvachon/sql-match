@@ -29,52 +29,37 @@ const sqlToRegex = pattern =>
 		throw new Error("Input must be a string");
 	}
 
-	const lastIndex = pattern.length - 1;
-	let escaping = false;
-	let i = -1;
-	let regex = "";
-	let sequencing = false;
+	const token = /[\\%_]|[^\\%_]+/g;
+	let regex = "^";
+	let match;
 
-	while (true)
+	loop: while ((match = token.exec(pattern)) !== null)
 	{
-		const char = pattern[++i];
+		switch (match[0])
+		{
+			case SQL_ESCAPE:
+				if ((match = token.exec(pattern)) === null)
+				{
+					break loop;
+				}
 
-		if (char!==SQL_SEQUENCED_WILDCARD && sequencing)
-		{
-			i--;
-			regex += REGEX_SEQUENCED_WILDCARD;
-			sequencing = false;
-		}
-		else if (i > lastIndex)
-		{
-			return new RegExp(`^${regex}$`);
-		}
-		else if (escaping)
-		{
-			escaping = false;
-			regex += escapeRegex(char);
-		}
-		else if (char === SQL_ESCAPE)
-		{
-			escaping = true;
-		}
-		else if (char === SQL_SINGLE_WILDCARD)
-		{
-			regex += REGEX_SINGLE_WILDCARD;
-		}
-		else if (char===SQL_SEQUENCED_WILDCARD && !sequencing)
-		{
-			sequencing = true;
-		}
-		else if (char===SQL_SEQUENCED_WILDCARD && sequencing)
-		{
-			// Ignore consecutive instances
-		}
-		else
-		{
-			regex += escapeRegex(char);
+				regex += escapeRegex(match[0]);
+				break;
+
+			case SQL_SEQUENCED_WILDCARD:
+				regex += REGEX_SEQUENCED_WILDCARD;
+				break;
+
+			case SQL_SINGLE_WILDCARD:
+				regex += REGEX_SINGLE_WILDCARD;
+				break;
+
+			default:
+				regex += escapeRegex(match[0]);
 		}
 	}
+
+	return new RegExp(regex + "$");
 };
 
 
