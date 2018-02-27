@@ -169,6 +169,13 @@ describe("Node.js", function()
 
 
 
+		it("ignores an escape character at the end of a pattern", function()
+		{
+			expect( isSQLMatch("string\\", string) ).to.be.true;
+		});
+
+
+
 		it("rejects non-string input", function()
 		{
 			const args = ["", 1, true, {}, [], function(){}];
