@@ -178,7 +178,7 @@ describe("Node.js", function()
 
 		it("rejects non-string input", function()
 		{
-			const args = ["", 1, true, {}, [], function(){}];
+			const args = ["", 1, true, {}, [], function(){}, null, undefined];
 
 			args.forEach((argA, a) =>
 			{
@@ -206,9 +206,9 @@ describe("Node.js", function()
 
 		it("rejects non-string input", function()
 		{
-			const args = [1, true, {}, [], function(){}];
+			const args = [1, true, {}, [], function(){}, null, undefined];
 
-			args.forEach((arg) => expect(() => sqlToRegex(arg)).to.throw());
+			args.forEach(arg => expect(() => sqlToRegex(arg)).to.throw());
 		});
 	});
 });
