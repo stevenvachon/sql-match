@@ -9,4 +9,4 @@ new Suite()
 	})*/
 	.on("cycle", event => console.log(event.target.toString()))
 	//.on("complete", ()= > console.log("Fastest is " + this.filter("fastest").map("name")))
-	.run(/*{ async:true }*/);
+	.run({ async:true });

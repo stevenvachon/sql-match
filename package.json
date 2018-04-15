@@ -1,7 +1,7 @@
 {
   "name": "sql-match",
   "description": "Match a string using an SQL pattern.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "author": "Steven Vachon <contact@svachon.com> (https://www.svachon.com/)",
   "repository": "stevenvachon/sql-match",
@@ -11,29 +11,28 @@
   },
   "devDependencies": {
     "babelify": "^8.0.0",
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
     "benchmark": "^2.1.4",
-    "browserify": "^16.1.0",
+    "browserify": "^16.2.2",
     "chai": "^4.1.2",
-    "coveralls": "^3.0.0",
-    "gzip-size-cli": "^2.1.0",
-    "mocha": "^5.0.1",
-    "nightmare": "^3.0.0",
-    "nyc": "^11.4.1",
-    "uglify-js": "^3.3.12",
-    "xvfb-maybe": "^0.2.1"
+    "coveralls": "^3.0.2",
+    "gzip-size-cli": "^3.0.0",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2",
+    "puppeteer": "^1.6.2",
+    "uglify-es": "^3.3.9"
   },
   "engines": {
     "node": ">= 6"
   },
   "scripts": {
     "benchmark": "node benchmark.js",
-    "browserify": "browserify index.js --transform [ babelify --presets [ env ] ] --standalone sqlMatch | uglifyjs --compress --mangle -o browser.js",
+    "browserify": "browserify index.js --transform [ babelify --presets [ env ] ] --standalone=sqlMatch | uglifyjs --compress --mangle -o browser.js",
     "ci": "npm test && nyc report --reporter=text-lcov | coveralls",
     "posttest": " nyc report --reporter=html && npm run benchmark --silent && gzip-size browser.js",
     "pretest": "npm run browserify --silent",
-    "test": "xvfb-maybe nyc --reporter=text-summary mocha test.js --check-leaks --bail"
+    "test": "nyc --reporter=text-summary mocha test.js --check-leaks --bail"
   },
   "files": [
     "browser.js",

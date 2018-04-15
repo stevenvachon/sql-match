@@ -2,20 +2,20 @@
 const {after, before, beforeEach, describe, it} = require("mocha");
 const {expect} = require("chai");
 const {isSQLMatch, sqlToRegex} = require("./");
-const Nightmare = require("nightmare");
+const puppeteer = require("puppeteer");
 
 
 
-describe("Node.js", function()
+describe("Node.js", () =>
 {
-	describe("isSQLMatch", function()
+	describe("isSQLMatch", () =>
 	{
 		const sentence = "1234567890!@#$^&*()-+=[]{},./? aaaabbbb sentence-like string";
 		const string = "string";
 
 
 
-		it("supports no wildcards", function()
+		it("supports no wildcards", () =>
 		{
 			expect( isSQLMatch("string", string) ).to.be.true;
 			expect( isSQLMatch("STRING", string) ).to.be.false;
@@ -24,6 +24,8 @@ describe("Node.js", function()
 			expect( isSQLMatch("strings",string) ).to.be.false;
 			expect( isSQLMatch("stringg",string) ).to.be.false;
 			expect( isSQLMatch("sstring",string) ).to.be.false;
+			expect( isSQLMatch(" string",string) ).to.be.false;
+			expect( isSQLMatch("string ",string) ).to.be.false;
 			expect( isSQLMatch("a",      string) ).to.be.false;
 			expect( isSQLMatch("",       string) ).to.be.false;
 
@@ -46,7 +48,7 @@ describe("Node.js", function()
 
 
 
-		it(`supports "_" wildcard`, function()
+		it(`supports "_" wildcard`, () =>
 		{
 			expect( isSQLMatch("_",       string) ).to.be.false;
 			expect( isSQLMatch("_tring",  string) ).to.be.true;
@@ -78,7 +80,7 @@ describe("Node.js", function()
 
 
 
-		it(`supports "%" wildcard`, function()
+		it(`supports "%" wildcard`, () =>
 		{
 			expect( isSQLMatch("%",       string) ).to.be.true;
 			expect( isSQLMatch("%tring",  string) ).to.be.true;
@@ -110,7 +112,7 @@ describe("Node.js", function()
 
 
 
-		it(`supports a mix of "_" and "%" wildcards`, function()
+		it(`supports a mix of "_" and "%" wildcards`, () =>
 		{
 			expect( isSQLMatch("%_",     string) ).to.be.true;
 			expect( isSQLMatch("%__",    string) ).to.be.true;
@@ -169,14 +171,38 @@ describe("Node.js", function()
 
 
 
-		it("ignores an escape character at the end of a pattern", function()
+		it(`does not support "[charlist]" patterns`, () =>
+		{
+			expect( isSQLMatch("str[i]ng", string) ).to.be.false;
+			expect( isSQLMatch("str[i]ng", "str[i]ng") ).to.be.true;
+		});
+
+
+
+		it(`does not support "?" wildcard`, () =>
+		{
+			expect( isSQLMatch("str?ng", string) ).to.be.false;
+			expect( isSQLMatch("str?ng", "str?ng") ).to.be.true;
+		});
+
+
+
+		it(`does not support "#" wildcard`, () =>
+		{
+			expect( isSQLMatch("1#3", "123") ).to.be.false;
+			expect( isSQLMatch("1#3", "1#3") ).to.be.true;
+		});
+
+
+
+		it("ignores an escape character at the end of a pattern", () =>
 		{
 			expect( isSQLMatch("string\\", string) ).to.be.true;
 		});
 
 
 
-		it("rejects non-string input", function()
+		it("rejects non-string input", () =>
 		{
 			const args = ["", 1, true, {}, [], function(){}, null, undefined];
 
@@ -184,7 +210,8 @@ describe("Node.js", function()
 			{
 				args.forEach((argB, b) =>
 				{
-					if (a!==b || a!==0)
+					// Avoid `"" === ""`, as it won't throw
+					if (a!==0 || b!==0)
 					{
 						expect(() => isSQLMatch(argA, argB)).to.throw();
 					}
@@ -195,16 +222,16 @@ describe("Node.js", function()
 
 
 
-	describe("sqlToRegex", function()
+	describe("sqlToRegex", () =>
 	{
-		it("works", function()
+		it("works", () =>
 		{
 			expect( sqlToRegex("%ing") ).to.be.a("regexp");
 		});
 
 
 
-		it("rejects non-string input", function()
+		it("rejects non-string input", () =>
 		{
 			const args = [1, true, {}, [], function(){}, null, undefined];
 
@@ -217,25 +244,42 @@ describe("Node.js", function()
 
 describe("Web browser", function()
 {
+	let browser, page;
+
+	const openBrowser = () =>
+	{
+		return puppeteer.launch({ args: ["--no-sandbox"] })
+		.then(puppeteerInstance =>
+		{
+			browser = puppeteerInstance;
+			return puppeteerInstance.newPage();
+		})
+		.then(pageInstance =>
+		{
+			page = pageInstance;
+		});
+	};
+
+
 	this.timeout(5000);
 
+	before(() => openBrowser());
 
-
-	let browser;
-
-	before(() => browser = new Nightmare({ nodeIntegration:false }).goto("about:blank"));
-
-	beforeEach(() => browser.refresh().then(() => browser.inject("js", "./browser.js")));
-
-	after(() => browser.end());
-
-
-
-	describe("isSQLMatch", function()
+	beforeEach(() =>
 	{
-		it("works", function()
+		return page.reload()
+		.then(() => page.addScriptTag({ path: "browser.js" }));
+	});
+
+	after(() => browser.close());
+
+
+
+	describe("isSQLMatch", () =>
+	{
+		it("works", () =>
 		{
-			return browser.evaluate( function()
+			return page.evaluate(() =>
 			{
 				return window.sqlMatch.isSQLMatch("%ing", "string");
 			})
@@ -245,11 +289,11 @@ describe("Web browser", function()
 
 
 
-	describe("sqlToRegex", function()
+	describe("sqlToRegex", () =>
 	{
-		it("works", function()
+		it("works", () =>
 		{
-			return browser.evaluate( function()
+			return page.evaluate(() =>
 			{
 				var regex = window.sqlMatch.sqlToRegex("%ing");
 

@@ -15,9 +15,10 @@ Supported features:
 Unsupported features:
 * Custom escape character (`ESCAPE`)
 * Ignored trailing spaces (MySQL's `=`)
+* Disallowed trailing escape character (PostgreSQL)
 * Collated international characters (`COLLATE` with `=`)
 * `[charlist]` patterns (Access and SQL Server)
-* `?` wildcard (Access)
+* `?` and `#` wildcards (Access)
 
 
 ## Installation
