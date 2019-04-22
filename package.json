@@ -1,42 +1,39 @@
 {
   "name": "sql-match",
   "description": "Match a string using an SQL pattern.",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "license": "MIT",
-  "author": "Steven Vachon <contact@svachon.com> (https://www.svachon.com/)",
-  "repository": "stevenvachon/sql-match",
+  "author": "Steven Vachon <contact@svachon.com> (https://svachon.com)",
+  "repository": "github:stevenvachon/sql-match",
+  "browser": "index-es5.js",
   "dependencies": {
-    "escape-string-regexp": "^1.0.5",
+    "escape-string-regexp": "^2.0.0",
     "is-string": "^1.0.4"
   },
   "devDependencies": {
-    "babelify": "^8.0.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0",
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
     "benchmark": "^2.1.4",
-    "browserify": "^16.2.2",
-    "chai": "^4.1.2",
-    "coveralls": "^3.0.2",
-    "gzip-size-cli": "^3.0.0",
-    "mocha": "^5.2.0",
-    "nyc": "^12.0.2",
-    "puppeteer": "^1.6.2",
-    "uglify-es": "^3.3.9"
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.3",
+    "mocha": "^6.1.4",
+    "nyc": "^14.0.0"
   },
   "engines": {
-    "node": ">= 6"
+    "node": ">= 8"
   },
   "scripts": {
     "benchmark": "node benchmark.js",
-    "browserify": "browserify index.js --transform [ babelify --presets [ env ] ] --standalone=sqlMatch | uglifyjs --compress --mangle -o browser.js",
     "ci": "npm test && nyc report --reporter=text-lcov | coveralls",
-    "posttest": " nyc report --reporter=html && npm run benchmark --silent && gzip-size browser.js",
-    "pretest": "npm run browserify --silent",
-    "test": "nyc --reporter=text-summary mocha test.js --check-leaks --bail"
+    "posttest": " nyc report --reporter=text-summary --reporter=html && npm run benchmark --silent",
+    "prepublishOnly": "npm test && babel index.js --out-file=index-es5.js --presets=@babel/env --source-maps",
+    "test": "nyc --silent mocha test.js --check-leaks --bail"
   },
   "files": [
-    "browser.js",
-    "index.js"
+    "index.js",
+    "index-es5.js",
+    "index-es5.js.map"
   ],
   "keywords": [
     "match",
